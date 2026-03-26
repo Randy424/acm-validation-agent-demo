@@ -1,4 +1,6 @@
-# Test Case 1: kind Cluster Validation (Mock Bug)
+# Test Case 2: Local Kind Cluster Validation (Mock Bug)
+
+**SECONDARY USE CASE** - Testing and development with local clusters
 
 **Bug ID:** ACM-9876 (Mock Scenario)
 **Summary:** Placement status empty when no clusters match selector
@@ -10,7 +12,15 @@
 
 ## Overview
 
-This test case demonstrates autonomous bug validation from scratch, including:
+This test case demonstrates **local development and testing** capabilities. It provisions a complete test environment from scratch and validates bugs without requiring access to production clusters.
+
+**Use this when:**
+- Testing bug validation workflows
+- Developing new validation scripts
+- No production cluster access available
+- Learning the tool
+
+**Features:**
 - Complete test environment provisioning (kind cluster)
 - ACM CRD installation
 - Test resource creation

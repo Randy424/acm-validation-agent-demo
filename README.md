@@ -41,7 +41,7 @@ Engineers spend **3-4 hours** manually reproducing bugs:
 
 ## 📸 Live Demo: Real Cluster Validation
 
-### Test Case 2: ACM-30661 (UI Bug on Production Cluster)
+### Test Case 1: ACM-30661 (UI Bug on Live Cluster)
 
 **Bug:** Incorrect automation alert when AAP is not installed
 
@@ -62,7 +62,7 @@ According to Jira ticket ACM-30661, when the Ansible Automation Platform (AAP) i
 
 #### Screenshot: Alert Captured
 
-![ACM Automation Page Alert](./test-cases/case-2-real-cluster/final-3-automation-page-loaded.png)
+![ACM Automation Page Alert](./test-cases/case-1-live-cluster/final-3-automation-page-loaded.png)
 
 **Alert Found:**
 ```
@@ -102,7 +102,7 @@ Traditional automation breaks when class names change. **Claude navigation adapt
 
 ## 🐳 Demo: kind Cluster Provisioning
 
-### Test Case 1: Mock Bug (Placement Status Missing)
+### Test Case 2: Mock Bug (Placement Status Missing - Local Kind)
 
 **Bug:** Placement status field empty when no clusters match selector
 
@@ -177,83 +177,80 @@ The autonomous agent:
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-```bash
-# Install Node.js dependencies
-npm install
-
-# This installs:
-# - @browserbasehq/stagehand (AI browser automation with Claude)
-# - dotenv (environment variables)
-
-# Set up Anthropic API key for Claude-powered navigation
-cp .env.example .env
-# Edit .env and add: ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
-
-# For kind cluster tests (optional)
-brew install kind kubectl
-
-# For real cluster tests - Required:
-# - Access to OpenShift cluster with ACM
-# - YOUR-USERNAME or equivalent credentials
-# - Anthropic API key (for AI navigation)
-```
-
-### Run Test Case 1: kind Cluster
+### Installation
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/acm-validation-agent-demo.git
+git clone https://github.com/Randy424/acm-validation-agent-demo.git
 cd acm-validation-agent-demo
 
 # Install dependencies
 npm install
 
-# Run full kind cluster demo (from parent directory)
-# This provisions infrastructure, creates resources, validates bug
-# See DEMO_COMPLETE_SUMMARY.md for full automation details
+# Set up Anthropic API key for Claude-powered navigation
+cp .env.example .env
+# Edit .env and add: ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 ```
 
-**What Happens:**
-1. kind cluster created
-2. ACM CRDs installed
-3. Test resources created
-4. Bug validated via kubectl
-5. Browser automation demonstrates Dashboard navigation
-6. Report generated
+### Usage (Agent Mode)
 
-**Duration:** ~40 minutes autonomous execution
+The agent provides a unified interface for all validation scenarios.
 
-### Run Test Case 2: Real Cluster
+**Option 1: Live Cluster Validation (Primary)**
 
 ```bash
-cd test-cases/case-2-real-cluster
+# 1. Create your configuration
+cp agent/config/live-cluster.example.json agent/config/my-cluster.json
 
-# Update cluster-config.json with your cluster credentials
-cat cluster-config.json
+# 2. Edit configuration with your cluster details
 {
-  "cluster_name": "your-cluster",
-  "credentials": {
+  "type": "live-cluster",
+  "cluster": {
     "username": "YOUR-USERNAME",
     "password": "your-password",
     "console_url": "https://console-openshift-console.apps.your-cluster.com"
   }
 }
 
-# Run validation
-node acm-automation-final.js
+# 3. Run validation
+npm run agent -- validate agent/config/my-cluster.json
+# or: acm-agent validate agent/config/my-cluster.json (if installed globally)
 ```
 
 **What Happens:**
-1. Browser opens (visible Chrome window)
-2. Logs into OpenShift Console via OAuth
-3. Navigates to Automation page
-4. Captures all alerts
-5. Generates validation report with screenshots
-6. Browser stays open 30 seconds for inspection
+1. AI navigates to OpenShift Console
+2. Authenticates via OAuth
+3. Navigates to target page (e.g., Automation)
+4. Extracts alerts using Claude AI
+5. Captures screenshots as evidence
+6. Generates comprehensive validation report
 
-**Duration:** ~1 minute autonomous execution
+**Duration:** ~1-2 minutes autonomous execution
+
+---
+
+**Option 2: Local Kind Cluster (Testing/Development)**
+
+```bash
+# 1. Create configuration
+cp agent/config/local-kind.example.json agent/config/my-kind.json
+
+# 2. Run validation (provisions cluster automatically)
+npm run agent -- validate agent/config/my-kind.json
+```
+
+**What Happens:**
+1. Creates kind cluster (if not exists)
+2. Installs ACM CRDs
+3. Creates test resources
+4. Validates via kubectl
+5. Generates report
+
+**Duration:** ~5-10 minutes (including cluster creation)
+
+**Prerequisites:**
+- Docker running
+- kind and kubectl installed: `brew install kind kubectl`
 
 ---
 
@@ -266,16 +263,25 @@ This tool is packaged for reuse across different Claude Code instances and envir
 ```
 acm-validation-agent-demo/
 │
+├── agent/                         # ⭐ Agent framework
+│   ├── index.js                   # Main agent entry point
+│   ├── lib/                       # Validator implementations
+│   │   ├── live-cluster-validator.js
+│   │   └── local-kind-validator.js
+│   └── config/                    # Configuration examples
+│       ├── live-cluster.example.json
+│       └── local-kind.example.json
+│
 ├── test-cases/                    # Test case implementations
-│   ├── case-1-kind-cluster/       # Local kind cluster testing
+│   ├── case-1-live-cluster/       # ⭐ PRIMARY: Live OpenShift cluster
 │   │   ├── README.md              # Full documentation
+│   │   ├── bug-spec.json          # Bug specification
+│   │   ├── cluster-config.json    # Cluster credentials
+│   │   ├── acm-stagehand-validator.js # AI-powered validator
 │   │   └── (evidence files)
 │   │
-│   └── case-2-real-cluster/       # Real OpenShift cluster testing
+│   └── case-2-local-kind/         # Local kind cluster (testing)
 │       ├── README.md              # Full documentation
-│       ├── bug-spec.json          # Bug specification
-│       ├── cluster-config.json    # Cluster credentials
-│       ├── acm-automation-final.js # ⭐ Main validator script
 │       └── (evidence files)
 │
 ├── shared/                        # Reusable modules
@@ -294,7 +300,7 @@ acm-validation-agent-demo/
 
 1. **Copy test case template:**
 ```bash
-cp -r test-cases/case-2-real-cluster test-cases/my-bug
+cp -r test-cases/case-1-live-cluster test-cases/my-bug
 cd test-cases/my-bug
 ```
 
@@ -411,10 +417,22 @@ acm-validate --bug-spec bug.json --cluster cluster.json
 
 Each test case generates a complete evidence package ready for Jira attachment:
 
-### kind Cluster Test (Case 1)
+### Live Cluster Test (Case 1) - PRIMARY
 
 ```
-test-cases/case-1-kind-cluster/
+test-cases/case-1-live-cluster/
+├── final-3-automation-page-loaded.png  ⭐ Visual proof of alert
+├── stagehand-validation-summary.json   Complete test data (AI-powered)
+├── FINAL_VALIDATION_REPORT.md          Comprehensive report
+├── stagehand-*.png                     AI navigation screenshots
+├── bug-spec.json                       Bug specification
+└── cluster-config.json                 Test environment info
+```
+
+### Local Kind Test (Case 2) - Testing/Development
+
+```
+test-cases/case-2-local-kind/
 ├── placement-status.yaml          ⭐ Proof: status field missing
 ├── managedclusterset.yaml         Supporting evidence
 ├── managedclusters.yaml           Supporting evidence
@@ -422,18 +440,6 @@ test-cases/case-1-kind-cluster/
 ├── VALIDATION_REPORT.md           200+ line report
 ├── dashboard-step-*.png           7 screenshots
 └── browser-validation-summary.json Machine-readable log
-```
-
-### Real Cluster Test (Case 2)
-
-```
-test-cases/case-2-real-cluster/
-├── final-3-automation-page-loaded.png  ⭐ Visual proof of alert
-├── final-validation-summary.json       Complete test data
-├── FINAL_VALIDATION_REPORT.md          Comprehensive report
-├── final-*.png (5 total)               Navigation screenshots
-├── bug-spec.json                       Bug specification
-└── cluster-config.json                 Test environment info
 ```
 
 ---
@@ -550,9 +556,10 @@ MIT License - See LICENSE file for details
 ## 🎓 Learn More
 
 ### Documentation
-- [Test Case 1: kind Cluster](./test-cases/case-1-kind-cluster/README.md)
-- [Test Case 2: Real Cluster](./test-cases/case-2-real-cluster/README.md)
-- [Stagehand Documentation](https://github.com/browserbasehq/stagehand)
+- [Agent Documentation](./agent/README.md)
+- [Test Case 1: Live Cluster (Primary)](./test-cases/case-1-live-cluster/README.md)
+- [Test Case 2: Local Kind Cluster](./test-cases/case-2-local-kind/README.md)
+- [Stagehand AI Documentation](https://github.com/browserbasehq/stagehand)
 
 ### Related Projects
 - [Claude Code](https://claude.ai/code)

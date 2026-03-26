@@ -1,4 +1,6 @@
-# Test Case 2: Real Cluster Validation (ACM-30661)
+# Test Case 1: Live Cluster Validation (ACM-30661)
+
+**⭐ PRIMARY USE CASE** - Production-ready validation on existing OpenShift clusters
 
 **Bug ID:** ACM-30661
 **Summary:** Automation alert when AAP is not installed is incorrect
@@ -10,7 +12,9 @@
 
 ## Overview
 
-This test case validates a UI bug in Red Hat Advanced Cluster Management (ACM) where an incorrect or outdated alert message is displayed on the Automation page when the Ansible Automation Platform (AAP) operator is not installed.
+This is the **primary use case** for the ACM Validation Agent. It demonstrates validating a UI bug in Red Hat Advanced Cluster Management (ACM) on a **live production cluster** using AI-powered browser automation.
+
+The bug: An incorrect or outdated alert message is displayed on the Automation page when the Ansible Automation Platform (AAP) operator is not installed.
 
 ## Test Environment
 

@@ -1,0 +1,12 @@
+{
+  "type": "local-kind",
+  "bug_spec": "../test-cases/case-2-local-kind/bug-spec.json",
+  "cluster": {
+    "name": "acm-validation"
+  },
+  "options": {
+    "provision": true,
+    "browser": false,
+    "cleanup": false
+  }
+}

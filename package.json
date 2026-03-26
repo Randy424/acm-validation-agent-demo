@@ -2,11 +2,15 @@
   "name": "acm-validation-agent",
   "version": "1.0.0",
   "description": "Autonomous bug validation for Red Hat ACM using Claude Code + Stagehand AI. Claude intelligently navigates UIs to validate bugs. Eliminates 95% of manual testing time.",
-  "main": "index.js",
+  "main": "agent/index.js",
+  "bin": {
+    "acm-agent": "./agent/index.js"
+  },
   "scripts": {
-    "validate:kind": "echo 'See test-cases/case-1-kind-cluster/README.md for kind cluster testing'",
-    "validate:cluster": "cd test-cases/case-2-real-cluster && node acm-stagehand-validator.js",
-    "test": "echo 'Run npm run validate:kind or npm run validate:cluster'",
+    "agent": "node agent/index.js",
+    "validate:live": "node agent/index.js validate agent/config/live-cluster.example.json",
+    "validate:kind": "node agent/index.js validate agent/config/local-kind.example.json",
+    "test": "echo 'Run: npm run agent -- validate <config-file>'",
     "prepare": "echo 'Installing dependencies...' && npm install"
   },
   "keywords": [
