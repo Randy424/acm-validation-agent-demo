@@ -1,11 +1,11 @@
 {
   "name": "acm-validation-agent",
   "version": "1.0.0",
-  "description": "Autonomous bug validation system for Red Hat ACM using Claude Code + Puppeteer. Eliminates 95% of manual bug reproduction time.",
+  "description": "Autonomous bug validation for Red Hat ACM using Claude Code + Stagehand AI. Claude intelligently navigates UIs to validate bugs. Eliminates 95% of manual testing time.",
   "main": "index.js",
   "scripts": {
     "validate:kind": "echo 'See test-cases/case-1-kind-cluster/README.md for kind cluster testing'",
-    "validate:cluster": "cd test-cases/case-2-real-cluster && node acm-automation-final.js",
+    "validate:cluster": "cd test-cases/case-2-real-cluster && node acm-stagehand-validator.js",
     "test": "echo 'Run npm run validate:kind or npm run validate:cluster'",
     "prepare": "echo 'Installing dependencies...' && npm install"
   },
@@ -15,7 +15,9 @@
     "automation",
     "testing",
     "qa",
-    "puppeteer",
+    "stagehand",
+    "ai-navigation",
+    "claude",
     "kubernetes",
     "bug-validation",
     "claude-code",
@@ -25,12 +27,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/acm-validation-agent-demo.git"
+    "url": "https://github.com/Randy424/acm-validation-agent-demo.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/acm-validation-agent-demo/issues"
+    "url": "https://github.com/Randy424/acm-validation-agent-demo/issues"
   },
-  "homepage": "https://github.com/yourusername/acm-validation-agent-demo#readme",
+  "homepage": "https://github.com/Randy424/acm-validation-agent-demo#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

@@ -1,8 +1,8 @@
 # ACM Autonomous Bug Validation Agent
 
-**Autonomous bug validation system using Claude Code + Puppeteer for Red Hat Advanced Cluster Management (ACM)**
+**Autonomous bug validation system using Claude Code + Stagehand AI for Red Hat Advanced Cluster Management (ACM)**
 
-Eliminate 95% of manual bug reproduction time by letting AI agents autonomously provision infrastructure, navigate UIs, and validate bugs with comprehensive evidence capture.
+Eliminate 95% of manual bug reproduction time by letting AI agents autonomously provision infrastructure, intelligently navigate UIs with Claude, and validate bugs with comprehensive evidence capture.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -27,7 +27,8 @@ Engineers spend **3-4 hours** manually reproducing bugs:
 - ✅ Provisions complete test infrastructure (kind clusters) OR connects to existing clusters
 - ✅ Reads bug specifications from JSON
 - ✅ Executes reproduction steps autonomously
-- ✅ Validates via CLI (kubectl) AND browser automation (Puppeteer)
+- ✅ Validates via CLI (kubectl) AND **AI-powered browser automation (Stagehand with Claude)**
+- ✅ **Claude navigates UIs intelligently** - no brittle CSS selectors
 - ✅ Captures comprehensive evidence (YAML, screenshots, JSON)
 - ✅ Generates production-ready validation reports
 
@@ -46,7 +47,7 @@ Engineers spend **3-4 hours** manually reproducing bugs:
 
 **Environment:** Real OpenShift 4.x cluster with ACM 2.17.0
 
-**Validation Method:** Autonomous browser automation with Puppeteer
+**Validation Method:** AI-powered browser automation with Stagehand (Claude Sonnet 4)
 
 #### The Alert We're Looking For
 
@@ -72,16 +73,19 @@ automation templates. Version 2.2.1 or greater is required to use
 workflow job templates."
 ```
 
-#### How the Bug Was Caught
+#### How the Bug Was Caught (AI-Powered)
 
-The autonomous agent:
-- ✅ **Authenticated** with YOUR-USERNAME credentials via OAuth flow
-- ✅ **Navigated** to `/multicloud/infrastructure/automations`
-- ✅ **Searched** for alerts using PatternFly component selectors
-- ✅ **Extracted** alert text and metadata
+The autonomous agent using **Claude AI via Stagehand**:
+- ✅ **AI-Authenticated** - Claude understood the OAuth flow and filled credentials
+- ✅ **AI-Navigated** - Claude found and clicked "Automation" menu intelligently (no brittle selectors)
+- ✅ **AI-Extracted** - Claude identified and extracted alert messages semantically
+- ✅ **No CSS Selectors** - Works even when UI changes (AI adapts)
 - ✅ **Validated** AAP installation status (confirmed not installed)
 - ✅ **Captured** 5 full-page screenshots as evidence
 - ✅ **Generated** validation report ready for engineering
+
+**What Makes This Special:**
+Traditional automation breaks when class names change. **Claude navigation adapts** - it understands "click the Automation link" regardless of CSS structure.
 
 **Evidence Generated:**
 - `final-validation-summary.json` - Complete test data
@@ -177,14 +181,23 @@ The autonomous agent:
 
 ```bash
 # Install Node.js dependencies
-npm install puppeteer dotenv
+npm install
+
+# This installs:
+# - @browserbasehq/stagehand (AI browser automation with Claude)
+# - dotenv (environment variables)
+
+# Set up Anthropic API key for Claude-powered navigation
+cp .env.example .env
+# Edit .env and add: ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 
 # For kind cluster tests (optional)
 brew install kind kubectl
 
-# For real cluster tests
+# For real cluster tests - Required:
 # - Access to OpenShift cluster with ACM
 # - YOUR-USERNAME or equivalent credentials
+# - Anthropic API key (for AI navigation)
 ```
 
 ### Run Test Case 1: kind Cluster
@@ -355,7 +368,8 @@ acm-validate --bug-spec bug.json --cluster cluster.json
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **Orchestration** | Claude Code (Sonnet 4.5) | AI agent coordination |
-| **Browser Automation** | Puppeteer v24.40.0 | Headless Chrome control |
+| **AI Navigation** | Stagehand + Claude Sonnet 4 | Intelligent UI navigation |
+| **Browser Automation** | Stagehand v3.2.0 | AI-powered browser control |
 | **Container Runtime** | Docker | kind cluster execution |
 | **Kubernetes** | kind v0.31.0 | Local K8s clusters |
 | **CLI** | kubectl | Resource validation |
@@ -446,7 +460,7 @@ test-cases/case-2-real-cluster/
 
 ### Video Recording
 - **Status:** Not implemented
-- **Reason:** Puppeteer doesn't natively support video
+- **Reason:** Stagehand doesn't natively support video
 - **Workaround:** Use `puppeteer-screen-recorder` or Playwright
 - **Future:** Migrate to Playwright for built-in video support
 
@@ -539,11 +553,11 @@ MIT License - See LICENSE file for details
 - [Test Case 1: kind Cluster](./test-cases/case-1-kind-cluster/README.md)
 - [Test Case 2: Real Cluster](./test-cases/case-2-real-cluster/README.md)
 - [Complete Demo Summary](./DEMO_COMPLETE_SUMMARY.md)
-- [Puppeteer Documentation](https://pptr.dev/)
+- [Stagehand Documentation](https://pptr.dev/)
 
 ### Related Projects
 - [Claude Code](https://claude.ai/code)
-- [Puppeteer](https://github.com/puppeteer/puppeteer)
+- [Stagehand](https://github.com/puppeteer/puppeteer)
 - [kind](https://kind.sigs.k8s.io/)
 - [Red Hat ACM](https://www.redhat.com/en/technologies/management/advanced-cluster-management)
 

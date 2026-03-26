@@ -23,10 +23,12 @@ This test case validates a UI bug in Red Hat Advanced Cluster Management (ACM) w
 ## Test Approach
 
 ### Automation Method
-- **Tool:** Puppeteer (headless browser automation)
+- **Tool:** Stagehand AI (AI-powered browser automation)
+- **AI Model:** Claude Sonnet 4 (navigates UI intelligently)
 - **Language:** Node.js
 - **Screenshot Capture:** Full-page screenshots at each navigation step
-- **Video Recording:** Not implemented (Puppeteer limitation, would require external screen recorder)
+- **Key Feature:** No brittle CSS selectors - Claude understands UI semantically
+- **Video Recording:** Not implemented (would require external screen recorder)
 
 ### Reproduction Steps
 
@@ -99,7 +101,12 @@ oc get pods -n ansible-automation-platform
 
 ```bash
 cd test-cases/case-2-real-cluster
-node acm-automation-final.js
+
+# Ensure .env has your Anthropic API key
+cat ../../.env | grep ANTHROPIC_API_KEY
+
+# Run AI-powered validation
+node acm-stagehand-validator.js
 ```
 
 The script will:
@@ -121,8 +128,9 @@ After running, check:
 
 | Script | Purpose | Status |
 |--------|---------|--------|
-| `acm-automation-final.js` | **✅ WORKING** - Complete validation with comprehensive alert search | Recommended |
-| `acm-automation-validator-v2.js` | ✅ WORKING - Simpler version | Alternative |
+| `acm-stagehand-validator.js` | **✅ RECOMMENDED** - AI-powered validation with Claude navigation | Primary |
+| `acm-automation-final.js` | ✅ WORKING - Traditional validation (no AI) | Fallback |
+| `acm-automation-validator-v2.js` | ✅ WORKING - Simpler traditional version | Alternative |
 | `acm-automation-validator-ui-nav.js` | ⚠️  UI navigation exploration | Experimental |
 | `acm-automation-validator.js` | ❌ Deprecated - Had login issues | Do not use |
 | `diagnose-login.js` | 🔧 Diagnostic tool for login page structure | Utility |
@@ -134,7 +142,7 @@ After running, check:
 | **Infrastructure** | Provisioned locally | Existing cluster |
 | **ACM** | CRDs only | Full ACM 2.17.0 |
 | **Bug Type** | API (Placement status) | UI (Alert message) |
-| **Validation** | CLI (kubectl) | Browser (Puppeteer) |
+| **Validation** | CLI (kubectl) | Browser (Stagehand AI) |
 | **Evidence** | YAML dumps | Screenshots + JSON |
 | **Setup Time** | 5 min | Already running |
 | **Best For** | API/backend bugs | UI/frontend bugs |
@@ -172,4 +180,4 @@ After running, check:
 ---
 
 **Last Updated:** March 26, 2026
-**Validator:** ACM Validation Agent (Claude Code + Puppeteer)
+**Validator:** ACM Validation Agent (Claude Code + Stagehand AI)
