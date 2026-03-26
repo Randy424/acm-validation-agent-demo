@@ -1,0 +1,16 @@
+{
+  "type": "live-cluster",
+  "bug_spec": "../test-cases/case-1-live-cluster/bug-spec.json",
+  "cluster": {
+    "name": "your-cluster-name",
+    "username": "YOUR-USERNAME",
+    "password": "YOUR-PASSWORD-HERE",
+    "api_url": "https://api.your-cluster.example.com:6443",
+    "console_url": "https://console-openshift-console.apps.your-cluster.example.com"
+  },
+  "options": {
+    "screenshots": true,
+    "video": false,
+    "cleanup": false
+  }
+}
