@@ -1,0 +1,50 @@
+{
+  "jira_ticket": "ACM-30661",
+  "summary": "Automation alert when AAP is not installed is incorrect",
+  "status": "New",
+  "assignee": "Kevin Cormier",
+  "acm_version": "2.16",
+  "bug_type": "UI - Incorrect Message",
+  "reproducibility": "Always",
+
+  "steps_to_reproduce": [
+    {
+      "step": 1,
+      "action": "Navigate to OpenShift Console",
+      "url": "https://console-openshift-console.apps.your-cluster.example.com"
+    },
+    {
+      "step": 2,
+      "action": "Login with YOUR-USERNAME credentials"
+    },
+    {
+      "step": 3,
+      "action": "Navigate to ACM perspective (if available) or find Clusters menu"
+    },
+    {
+      "step": 4,
+      "action": "Click on 'Automation' under Clusters section"
+    },
+    {
+      "step": 5,
+      "action": "Observe the alert message when AAP is not installed"
+    }
+  ],
+
+  "expected_result": "Alert should display correct information about Ansible workflow deprecation",
+  "actual_result": "Alert displays incorrect/outdated information",
+
+  "evidence_to_capture": [
+    "Screenshot of incorrect automation alert",
+    "Full page screenshot showing navigation path",
+    "Browser console logs if any errors present"
+  ],
+
+  "validation_criteria": {
+    "bug_confirmed_if": [
+      "Alert message is visible",
+      "Alert content references deprecated Ansible workflow support",
+      "Message does not reflect current ACM capabilities"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "key": "ACM-9876",
+  "fields": {
+    "summary": "Placement fails when ManagedClusterSet has no matching clusters",
+    "description": "When creating a Placement that references a ManagedClusterSet with no clusters matching the label selector, the Placement gets stuck in a pending state instead of reporting zero matches.\n\n*Steps to Reproduce:*\n# Create a ManagedClusterSet named 'test-set'\n# Create a Placement targeting 'test-set' with label selector 'environment=production'\n# Verify no managed clusters have the 'environment=production' label\n# Observe Placement status\n\n*Expected Result:*\nPlacement should show status with 0 decisions and condition 'PlacementSatisfied=False' with reason 'NoMatchingClusters'\n\n*Actual Result:*\nPlacement status remains empty, no conditions are set, appears to be stuck waiting\n\n*Environment:*\n- ACM Version: 2.16.0\n- OpenShift Version: 4.15.1\n- Cluster: kind (local)\n\n*Impact:*\nApplications using this Placement will not receive clear feedback about why their workload isn't being deployed.",
+    "issuetype": {
+      "name": "Bug"
+    },
+    "status": {
+      "name": "New"
+    },
+    "priority": {
+      "name": "Major"
+    },
+    "created": "2026-03-20T14:32:00.000-0500",
+    "updated": "2026-03-20T14:32:00.000-0500",
+    "reporter": {
+      "displayName": "Jane Developer"
+    },
+    "components": [
+      {
+        "name": "Placement"
+      }
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test outputs (screenshots - keep only example)
+*.log
+test-cases/*/step-*.png
+test-cases/*/final-*.png
+test-cases/*/ui-nav-*.png
+test-cases/*/dashboard-step-*.png
+
+# Keep example screenshot for docs
+!test-cases/case-2-real-cluster/final-3-automation-page-loaded.png
+
+# Kubernetes configs (sensitive)
+test-cases/*/cluster-config.json
+
+# Validation outputs (generated files)
+test-cases/*/*.yaml
+test-cases/*/validation-summary.json
+test-cases/*/final-validation-summary.json
+test-cases/*/browser-validation-summary.json
+
+# Temporary files
+*.tmp
+*.temp

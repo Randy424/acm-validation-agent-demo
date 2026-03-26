@@ -1,0 +1,15 @@
+{
+  "cluster_name": "your-cluster-name",
+  "cluster_type": "openshift",
+  "credentials": {
+    "username": "YOUR-USERNAME",
+    "password": "your-password-here",
+    "api_url": "https://api.your-cluster.example.com:6443",
+    "console_url": "https://console-openshift-console.apps.your-cluster.example.com"
+  },
+  "test_scenario": {
+    "bug_id": "ACM-XXXXX",
+    "description": "Bug description",
+    "notes": "Any additional context"
+  }
+}

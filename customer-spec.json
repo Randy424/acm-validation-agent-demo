@@ -1,0 +1,105 @@
+{
+  "customer": "Acme Corporation",
+  "ticket_id": "ACM-9876",
+  "reported_date": "2026-03-20",
+  "severity": "Major",
+  "issue": {
+    "summary": "Placement status remains empty when ManagedClusterSet has no matching clusters",
+    "description": "When a Placement references a ManagedClusterSet that has no clusters matching the label selector, the Placement status field remains completely empty instead of reporting zero matches with appropriate conditions."
+  },
+  "environment": {
+    "acm_version": "2.16.0",
+    "openshift_version": "4.15.1",
+    "cluster_type": "kind (local development)"
+  },
+  "reproduction_steps": [
+    {
+      "step": 1,
+      "action": "Create ManagedClusterSet named 'test-set'",
+      "cli_command": "kubectl apply -f managedclusterset.yaml"
+    },
+    {
+      "step": 2,
+      "action": "Create Placement targeting 'test-set' with label selector 'environment=production'",
+      "cli_command": "kubectl apply -f placement.yaml",
+      "details": {
+        "placement_name": "test-placement",
+        "namespace": "placement-test",
+        "selector": {
+          "matchLabels": {
+            "environment": "production"
+          }
+        }
+      }
+    },
+    {
+      "step": 3,
+      "action": "Verify no managed clusters have the 'environment=production' label",
+      "cli_command": "kubectl get managedclusters --show-labels",
+      "expected_result": "No clusters or none with environment=production"
+    },
+    {
+      "step": 4,
+      "action": "Check Placement status",
+      "methods": [
+        "Via CLI: kubectl get placement test-placement -n placement-test -o yaml",
+        "Via ACM Console: Applications > Placements > test-placement"
+      ]
+    }
+  ],
+  "expected_behavior": {
+    "cli": {
+      "status": {
+        "numberOfSelectedClusters": 0,
+        "conditions": [
+          {
+            "type": "PlacementSatisfied",
+            "status": "False",
+            "reason": "NoMatchingClusters",
+            "message": "No ManagedClusters match the placement's cluster selector"
+          }
+        ]
+      }
+    },
+    "ui": {
+      "placement_detail_page": {
+        "status_section": "Should display '0 clusters selected'",
+        "conditions_section": "Should show PlacementSatisfied=False with reason",
+        "decisions_section": "Empty array (no clusters to place on)"
+      }
+    }
+  },
+  "actual_behavior": {
+    "cli": {
+      "status": {}
+    },
+    "ui": {
+      "placement_detail_page": {
+        "status_section": "Shows no status information",
+        "conditions_section": "Empty/missing",
+        "decisions_section": "Not populated"
+      }
+    }
+  },
+  "impact": {
+    "user_experience": "Applications using this Placement receive no feedback about why their workload isn't being deployed",
+    "debugging_difficulty": "Users cannot distinguish between configuration errors and legitimate zero-match scenarios",
+    "affected_workflows": [
+      "Multi-cluster application deployment",
+      "Policy distribution via Placements",
+      "GitOps cluster selection"
+    ]
+  },
+  "validation_criteria": {
+    "bug_confirmed_if": [
+      "Placement status field is empty ({})",
+      "No conditions array present in status",
+      "ACM UI shows no status information for the Placement"
+    ],
+    "bug_not_present_if": [
+      "Status contains numberOfSelectedClusters field (even if 0)",
+      "Conditions array exists with PlacementSatisfied condition",
+      "ACM UI displays clear feedback about zero matches"
+    ]
+  }
+}

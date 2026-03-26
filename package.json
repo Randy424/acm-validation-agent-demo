@@ -1,0 +1,54 @@
+{
+  "name": "acm-validation-agent",
+  "version": "1.0.0",
+  "description": "Autonomous bug validation system for Red Hat ACM using Claude Code + Puppeteer. Eliminates 95% of manual bug reproduction time.",
+  "main": "index.js",
+  "scripts": {
+    "validate:kind": "echo 'See test-cases/case-1-kind-cluster/README.md for kind cluster testing'",
+    "validate:cluster": "cd test-cases/case-2-real-cluster && node acm-automation-final.js",
+    "test": "echo 'Run npm run validate:kind or npm run validate:cluster'",
+    "prepare": "echo 'Installing dependencies...' && npm install"
+  },
+  "keywords": [
+    "acm",
+    "openshift",
+    "automation",
+    "testing",
+    "qa",
+    "puppeteer",
+    "kubernetes",
+    "bug-validation",
+    "claude-code",
+    "ai-agent"
+  ],
+  "author": "ACM QE Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/acm-validation-agent-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/acm-validation-agent-demo/issues"
+  },
+  "homepage": "https://github.com/yourusername/acm-validation-agent-demo#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "^3.2.0",
+    "dotenv": "^17.3.1",
+    "puppeteer": "^24.40.0"
+  },
+  "devDependencies": {},
+  "directories": {
+    "test": "test-cases"
+  },
+  "files": [
+    "test-cases/",
+    "shared/",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ]
+}
