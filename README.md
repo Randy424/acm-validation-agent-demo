@@ -266,28 +266,26 @@ acm-validation-agent-demo/
 ├── agent/                         # ⭐ Agent framework
 │   ├── index.js                   # Main agent entry point
 │   ├── lib/                       # Validator implementations
-│   │   ├── live-cluster-validator.js
-│   │   └── local-kind-validator.js
-│   └── config/                    # Configuration examples
-│       ├── live-cluster.example.json
-│       └── local-kind.example.json
+│   ├── config/                    # Configuration examples
+│   └── README.md                  # Agent documentation
 │
 ├── test-cases/                    # Test case implementations
-│   ├── case-1-live-cluster/       # ⭐ PRIMARY: Live OpenShift cluster
-│   │   ├── README.md              # Full documentation
-│   │   ├── bug-spec.json          # Bug specification
-│   │   ├── cluster-config.json    # Cluster credentials
-│   │   ├── acm-stagehand-validator.js # AI-powered validator
-│   │   └── (evidence files)
-│   │
-│   └── case-2-local-kind/         # Local kind cluster (testing)
-│       ├── README.md              # Full documentation
-│       └── (evidence files)
+│   ├── case-1-live-cluster/       # ⭐ PRIMARY: Live cluster validation
+│   └── case-2-local-kind/         # Local kind (testing/development)
 │
 ├── shared/                        # Reusable modules
 │   ├── dashboard-validator.js     # Kubernetes Dashboard automation
 │   ├── acm-crds.yaml             # ACM CRD definitions
 │   └── customer-spec.json         # Specification format
+│
+├── docs/                          # Additional documentation
+│   ├── AGENT_TASK.md              # Agent task examples
+│   ├── OPENSHIFT_SETUP.md         # Setup guides
+│   └── README.md                  # Documentation index
+│
+├── examples/                      # Example/test scripts
+│   ├── test-stagehand.js          # Stagehand tests
+│   └── README.md                  # Examples documentation
 │
 ├── package.json                   # Node.js dependencies
 ├── .env.example                   # Environment variables template
@@ -556,10 +554,11 @@ MIT License - See LICENSE file for details
 ## 🎓 Learn More
 
 ### Documentation
-- [Agent Documentation](./agent/README.md)
+- [Agent Documentation](./agent/README.md) - CLI and configuration reference
 - [Test Case 1: Live Cluster (Primary)](./test-cases/case-1-live-cluster/README.md)
 - [Test Case 2: Local Kind Cluster](./test-cases/case-2-local-kind/README.md)
-- [Stagehand AI Documentation](https://github.com/browserbasehq/stagehand)
+- [Additional Setup Guides](./docs/README.md) - OpenShift setup, agent tasks, etc.
+- [Examples and Tests](./examples/README.md) - Development scripts
 
 ### Related Projects
 - [Claude Code](https://claude.ai/code)
