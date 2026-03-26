@@ -1,0 +1,25 @@
+{
+  "bug_id": "ACM-30661",
+  "timestamp": "2026-03-26T21:52:08.615Z",
+  "cluster": "your-cluster-name",
+  "url": "https://console-openshift-console.apps.your-cluster.example.com/multicloud/infrastructure/automations",
+  "validation_method": "Stagehand AI (Claude Sonnet 4)",
+  "alerts": [],
+  "screenshots": [
+    {
+      "step": 1,
+      "description": "console-landing",
+      "filename": "stagehand-1-console-landing.png"
+    },
+    {
+      "step": 2,
+      "description": "automation-page",
+      "filename": "stagehand-2-automation-page.png"
+    },
+    {
+      "step": 3,
+      "description": "alerts-extracted",
+      "filename": "stagehand-3-alerts-extracted.png"
+    }
+  ]
+}

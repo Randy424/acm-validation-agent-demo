@@ -25,21 +25,18 @@ async function validateWithStagehand() {
     headless: false,
     verbose: 1,
     debugDom: true,
-    enableCaching: false,
-    llmProvider: 'anthropic',
-    llmClient: {
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      modelName: 'claude-sonnet-4-20250514'
-    }
+    enableCaching: false
   });
 
   const screenshots = [];
   let stepNumber = 0;
 
+  let page; // Will be set after init
+
   async function captureStep(description) {
     stepNumber++;
     const filename = path.join(__dirname, `stagehand-${stepNumber}-${description.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`);
-    await stagehand.page.screenshot({ path: filename, fullPage: true });
+    await page.screenshot({ path: filename, fullPage: true });
     screenshots.push({ step: stepNumber, description, filename: path.basename(filename) });
     console.log(`  📸 ${stepNumber}: ${description}`);
     return filename;
@@ -47,18 +44,27 @@ async function validateWithStagehand() {
 
   try {
     await stagehand.init();
+    // Get page from Stagehand's context
+    const pages = Array.from(stagehand.ctx.pagesByTarget.values());
+    page = pages[0];
+
+    if (!page) {
+      throw new Error("Failed to get page from Stagehand");
+    }
+
+    console.log(`   Stagehand initialized, browser ready\n`);
 
     // Step 1: Navigate to console
     console.log("1️⃣  AI navigating to OpenShift Console...");
-    await stagehand.page.goto(consoleUrl, { waitUntil: 'domcontentloaded' });
-    await stagehand.page.waitForTimeout(5000);
+    await page.goto(consoleUrl, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(5000);
     await captureStep('console-landing');
 
     // Step 2: AI-powered login
     console.log("2️⃣  AI handling authentication...");
 
     // Check if on login page
-    const currentUrl = stagehand.page.url();
+    const currentUrl = page.url();
     if (currentUrl.includes('oauth') || currentUrl.includes('login')) {
       console.log("   On OAuth login page");
 
@@ -66,7 +72,7 @@ async function validateWithStagehand() {
       await stagehand.act({
         action: "click on the authentication provider link that mentions 'kube:admin' or 'htpasswd'"
       });
-      await stagehand.page.waitForTimeout(3000);
+      await page.waitForTimeout(3000);
       await captureStep('provider-selected');
 
       // Use Stagehand AI to fill login form
@@ -85,7 +91,7 @@ async function validateWithStagehand() {
         action: "click the login or submit button"
       });
 
-      await stagehand.page.waitForTimeout(6000);
+      await page.waitForTimeout(6000);
       await captureStep('logged-in');
       console.log("   ✅ AI completed login\n");
     }
@@ -98,18 +104,18 @@ async function validateWithStagehand() {
       await stagehand.act({
         action: "navigate to the Automation section under Infrastructure or Clusters"
       });
-      await stagehand.page.waitForTimeout(4000);
+      await page.waitForTimeout(4000);
     } catch (navError) {
       // Fallback to direct URL
       console.log("   AI navigation failed, using direct URL");
-      await stagehand.page.goto(`${consoleUrl}/multicloud/infrastructure/automations`, {
+      await page.goto(`${consoleUrl}/multicloud/infrastructure/automations`, {
         waitUntil: 'domcontentloaded'
       });
-      await stagehand.page.waitForTimeout(5000);
+      await page.waitForTimeout(5000);
     }
 
     await captureStep('automation-page');
-    console.log(`   Current URL: ${stagehand.page.url()}\n`);
+    console.log(`   Current URL: ${page.url()}\n`);
 
     // Step 4: AI extract alerts
     console.log("4️⃣  AI extracting alerts...");
@@ -148,7 +154,7 @@ async function validateWithStagehand() {
       bug_id: "ACM-30661",
       timestamp: new Date().toISOString(),
       cluster: config.cluster_name,
-      url: stagehand.page.url(),
+      url: page.url(),
       validation_method: "Stagehand AI (Claude Sonnet 4)",
       alerts: alertInfo.alerts || [],
       screenshots: screenshots
@@ -164,7 +170,7 @@ async function validateWithStagehand() {
     console.log(`🤖 Alerts found by AI: ${alertInfo.alerts?.length || 0}\n`);
 
     console.log("⏳ Keeping browser open for 20 seconds...");
-    await stagehand.page.waitForTimeout(20000);
+    await page.waitForTimeout(20000);
 
     await stagehand.close();
     return summary;
