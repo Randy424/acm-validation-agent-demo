@@ -524,7 +524,7 @@ done
 
 ## 🤝 Contributing
 
-This tool was built for the ACM 2.16 Celebration Mini-Hackathon but is designed for ongoing use.
+This tool is designed for ongoing use and community contribution.
 
 **To extend or improve:**
 1. Fork the repository
@@ -552,8 +552,7 @@ MIT License - See LICENSE file for details
 ### Documentation
 - [Test Case 1: kind Cluster](./test-cases/case-1-kind-cluster/README.md)
 - [Test Case 2: Real Cluster](./test-cases/case-2-real-cluster/README.md)
-- [Complete Demo Summary](./DEMO_COMPLETE_SUMMARY.md)
-- [Stagehand Documentation](https://pptr.dev/)
+- [Stagehand Documentation](https://github.com/browserbasehq/stagehand)
 
 ### Related Projects
 - [Claude Code](https://claude.ai/code)

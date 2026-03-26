@@ -1,13 +1,13 @@
-# OpenShift + ACM Setup for Agent Demo
+# OpenShift + ACM Setup Guide
 
 ## Why OpenShift + ACM?
 
-Using **real OpenShift + ACM operator + ACM UI** makes your demo more compelling:
+Using **real OpenShift + ACM operator + ACM UI** provides the most realistic validation:
 
 ✅ **Realistic:** Actual production environment, not mocked
-✅ **Visual:** Can show ACM console UI in the video
+✅ **Visual:** Full ACM console UI available
 ✅ **Complete:** Real placement controller behavior, not simulated
-✅ **Credible:** Audience sees this works on real infrastructure
+✅ **Production-ready:** Tests on actual infrastructure
 
 ## Installation Requirements
 
@@ -19,11 +19,11 @@ Using **real OpenShift + ACM operator + ACM UI** makes your demo more compelling
 | ACM Operator | +2GB | +10GB | +1 core |
 | **Total Recommended** | **12GB** | **50GB** | **4 cores** |
 
-### Before the Agent Runs
+### Installation Options
 
 **Option 1: Pre-install CRC (Recommended)**
 
-Having CRC already installed saves time in the demo:
+Having CRC already installed saves time:
 
 ```bash
 # Install CRC
@@ -75,11 +75,11 @@ When the agent starts with pre-installed CRC:
 00:40 - DONE ✅
 ```
 
-**Total: ~40 minutes** (but you can speed up the video to 3 minutes!)
+**Total: ~40 minutes**
 
-## What the Agent Will Show in Video
+## What the Agent Captures
 
-The agent's video will capture:
+The validation process includes:
 
 1. **Terminal Output:**
    - `crc start` and OpenShift initialization
@@ -132,9 +132,9 @@ crc stop
 
 If CRC works for you manually, the agent can use it.
 
-## Demo Day Checklist
+## Pre-Validation Checklist
 
-Before starting the agent:
+Before running validation:
 
 - [ ] **CRC is installed** (`crc version` works)
 - [ ] **CRC is configured** (`crc setup` has been run)
@@ -144,12 +144,10 @@ Before starting the agent:
 - [ ] **Network is stable** (operator images need to download)
 
 Then:
-1. Open Cursor in the demo directory
-2. Start the agent with the AGENT_TASK.md instructions
-3. Let it run (30-40 min)
-4. Agent records video automatically
-5. Review the generated validation report and video
-6. Speed up video to 3 minutes for your demo
+1. Navigate to the project directory
+2. Run the validation script
+3. Wait for completion (30-40 min)
+4. Review the generated validation report
 
 ## What If CRC Fails?
 
@@ -162,7 +160,7 @@ If ACM operator fails → use ACM CRDs only
 If network issues → use cached images where possible
 ```
 
-The demo still works, just with reduced fidelity.
+Validation still works, just with reduced fidelity.
 
 ## Pro Tips
 
@@ -180,22 +178,16 @@ The demo still works, just with reduced fidelity.
 
 3. Don't run other VMs (conflicts with CRC's resources)
 
-**For the Best Video Quality:**
+**For the Best Validation Results:**
 
-- Let agent run with full ACM operator (shows real behavior)
-- Make sure agent captures UI screenshots (visual impact)
-- Include both CLI and UI validation in the video
+- Run with full ACM operator (shows real behavior)
+- Ensure UI screenshots are captured (visual evidence)
+- Include both CLI and UI validation
 
 ## Estimated Costs
 
 - **CRC (local):** $0 (free, runs on your machine)
-- **Cloud OpenShift:** ~$2-5 for a few hours (if you want even more realism)
+- **Cloud OpenShift:** ~$2-5 for a few hours (more realistic environment)
 - **AWS kind cluster:** ~$0.50/hour for a small EC2 instance
 
-**Recommendation for hackathon:** Use CRC (local) - it's free and fully realistic.
-
----
-
-**Bottom Line:**
-
-Pre-install CRC before the demo → agent completes in ~40 min → you get a complete video showing real OpenShift + ACM + UI → speed it up to 3 min → win the hackathon! 🏆
+**Recommendation:** Use CRC (local) - it's free and provides a fully realistic OpenShift environment.
