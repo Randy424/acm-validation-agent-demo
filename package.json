@@ -7,11 +7,13 @@
     "acm-agent": "./agent/index.js"
   },
   "scripts": {
+    "setup": "node setup.js",
+    "validate": "node shared/generic-validator.js",
+    "validate:jira": "node validate-jira.js",
     "agent": "node agent/index.js",
-    "validate:live": "node agent/index.js validate agent/config/live-cluster.example.json",
-    "validate:kind": "node agent/index.js validate agent/config/local-kind.example.json",
-    "test": "echo 'Run: npm run agent -- validate <config-file>'",
-    "prepare": "echo 'Installing dependencies...' && npm install"
+    "test": "echo 'Run: npm run validate:jira ACM-XXXXX'",
+    "prepare": "echo 'Installing dependencies...' && npm install",
+    "postinstall": "chmod +x setup.js validate-jira.js"
   },
   "keywords": [
     "acm",

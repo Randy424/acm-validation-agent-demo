@@ -86,14 +86,13 @@ class LiveClusterValidator {
   }
 
   /**
-   * Run the Stagehand validator
+   * Run the generic validator
    */
   async runValidator() {
-    const scriptPath = path.join(this.testCaseDir, 'acm-stagehand-validator.js');
+    const genericValidatorPath = path.join(__dirname, '../../shared/generic-validator.js');
 
     return new Promise((resolve, reject) => {
-      const child = spawn('node', [scriptPath], {
-        cwd: this.testCaseDir,
+      const child = spawn('node', [genericValidatorPath, this.testCaseDir], {
         stdio: 'inherit',
         env: { ...process.env }
       });

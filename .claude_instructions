@@ -1,0 +1,180 @@
+# ACM Validation Agent - Instructions for Claude
+
+## Repository Purpose
+
+This is an autonomous bug validation system for Red Hat Advanced Cluster Management (ACM). It uses AI-powered browser automation (Stagehand + Claude) to validate bugs with minimal human intervention.
+
+## First Time in This Repository?
+
+**Run the setup wizard:**
+```bash
+npm run setup
+```
+
+This configures:
+- Test environment (live cluster or kind)
+- Cluster credentials
+- Browser automation tool (Stagehand recommended)
+- Anthropic API key
+- Jira integration (optional)
+
+**All configuration is stored locally and gitignored.**
+
+## Configuration Status
+
+Check if configured:
+```bash
+test -f agent/config/user-config.json && echo "✅ Configured" || echo "❌ Run: npm run setup"
+```
+
+## Core Workflow
+
+### Validate from Jira
+```bash
+npm run validate:jira ACM-31343
+```
+
+This:
+1. Fetches bug from Jira
+2. Creates bug-spec.json
+3. Infers validation type
+4. Runs AI-powered validation
+5. Generates report with screenshots
+
+### Manual Validation
+```bash
+mkdir test-cases/ACM-XXXXX
+# Create bug-spec.json (see VALIDATOR-GUIDE.md for format)
+npm run validate test-cases/ACM-XXXXX
+```
+
+## Key Files
+
+- **`shared/generic-validator.js`** - Single validator for all bugs (configuration-driven)
+- **`setup.js`** - Interactive setup wizard
+- **`validate-jira.js`** - Jira integration
+- **`agent/config/user-config.json`** - User configuration (gitignored)
+- **`.env`** - API keys (gitignored)
+
+## Validation Types
+
+The validator supports multiple validation types:
+
+1. **`zoom-test`** - Tests UI at different zoom levels (50%, 75%, 100%, 125%, 150%, 200%)
+2. **`alert-check`** - Extracts and validates alert messages
+3. **`ui-element`** - Step-by-step UI interaction testing
+4. **`standard`** - Basic page validation
+
+Types are auto-inferred from bug descriptions or manually specified in bug-spec.json.
+
+## Important Principles
+
+### DO:
+- ✅ Run `npm run setup` before first validation
+- ✅ Use the generic validator for ALL bugs
+- ✅ Let configuration files drive behavior
+- ✅ Use `npm run validate:jira` for easiest workflow
+- ✅ Verify user-config.json exists before running validations
+
+### DON'T:
+- ❌ Create custom validator scripts per bug
+- ❌ Hardcode cluster credentials in code
+- ❌ Commit user-config.json or .env files
+- ❌ Use example configs for actual testing
+
+## Onboarding Checklist
+
+When helping a user get started:
+
+1. Check if `agent/config/user-config.json` exists
+2. If not, guide them to run `npm run setup`
+3. The wizard collects:
+   - Environment type (live/kind)
+   - Cluster credentials
+   - Tool preference (Stagehand/Puppeteer)
+   - Anthropic API key
+   - Jira credentials (optional)
+4. Once configured, they can validate with `npm run validate:jira ACM-XXXXX`
+
+## Bug Spec Format
+
+```json
+{
+  "jira_ticket": "ACM-XXXXX",
+  "summary": "Brief description",
+  "validation_type": "zoom-test|alert-check|ui-element|standard",
+  "environment": {
+    "component": "Cluster Pools|Automation|Clusters|Applications|Governance"
+  },
+  "zoom_levels": [50, 75, 100, 125, 150, 200],  // For zoom-test
+  "steps_to_reproduce": [                        // For ui-element
+    { "step": 1, "action": "natural language instruction" }
+  ]
+}
+```
+
+## Stagehand API (Critical)
+
+Stagehand v3.2.0 requires:
+
+**Correct:**
+```javascript
+const stagehand = new Stagehand({
+  model: "anthropic/claude-sonnet-4-20250514"  // Note: 'model' not 'modelName'
+});
+
+await stagehand.act("click on the login button");  // String, not { action: "..." }
+```
+
+**Wrong:**
+```javascript
+modelName: "..."  // ❌ Wrong parameter name
+await stagehand.act({ action: "..." });  // ❌ Old API format
+```
+
+## Common Tasks
+
+### Add New Validation Type
+Edit `shared/generic-validator.js`, add to `executeValidation()` switch statement.
+
+### Add New Component Navigation
+Edit `generic-validator.js`, update `navMap` and `urlMap` in `navigateToTargetPage()`.
+
+### Update Configuration
+```bash
+npm run setup  # Re-runs wizard, detects existing config
+```
+
+### Debug Validation
+Generated artifacts are in `test-cases/ACM-XXXXX/`:
+- `*-validation-summary.json` - Machine-readable results
+- `*-VALIDATION-REPORT.md` - Human-readable report
+- `*.png` - Screenshots at each step
+
+## Security
+
+All sensitive data is gitignored:
+- `agent/config/user-config.json` - Cluster credentials
+- `.env` - API keys
+- `test-cases/*/cluster-config.json` - Per-test credentials
+
+Always verify these are in .gitignore before committing.
+
+## Getting Help
+
+Point users to:
+- `QUICKSTART.md` - Fastest way to get started
+- `ONBOARDING.md` - Complete onboarding guide
+- `VALIDATOR-GUIDE.md` - Usage reference
+- `README.md` - Full documentation
+
+## When User Has Issues
+
+1. **"Configuration not found"** → `npm run setup`
+2. **"Jira integration disabled"** → `npm run setup`, enable Jira
+3. **"API key not found"** → Check `.env` file, re-run setup
+4. **"Cluster not accessible"** → Verify `agent/config/user-config.json`
+
+## Summary
+
+This is a **configuration-driven** validation system. The user configures once (`npm run setup`), then validates any bug with one command (`npm run validate:jira ACM-XXXXX`). No custom code per bug.

@@ -4,8 +4,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# env config files
+# User config files (credentials, API keys)
 agent/config/*.json
+!agent/config/*.example.json
+agent/config/user-config.json
 
 # Environment variables
 .env
