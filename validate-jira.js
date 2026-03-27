@@ -78,28 +78,44 @@ class JiraValidator {
 
     let authHeader;
     if (auth_type === 'token') {
-      const emailOrUser = username || process.env.USER + '@redhat.com';
-      const base64Auth = Buffer.from(`${emailOrUser}:${api_token}`).toString('base64');
+      const token = api_token || process.env.JIRA_API_TOKEN;
+      const emailOrUser = username || process.env.JIRA_EMAIL || process.env.USER + '@redhat.com';
+      const base64Auth = Buffer.from(`${emailOrUser}:${token}`).toString('base64');
       authHeader = `Authorization: Basic ${base64Auth}`;
     } else {
       const base64Auth = Buffer.from(`${username}:${password}`).toString('base64');
       authHeader = `Authorization: Basic ${base64Auth}`;
     }
 
-    return `curl -s "${server}/rest/api/2/issue/${this.jiraTicket}" -H "${authHeader}"`;
+    return `curl -s "${server}/rest/api/2/issue/${this.jiraTicket}?expand=attachment" -H "${authHeader}"`;
   }
 
   parseJiraOutput(output) {
     // If output looks like JSON, parse it
     if (output.trim().startsWith('{')) {
       const json = JSON.parse(output);
+
+      // Extract image attachments (only available from REST API with expand=attachment)
+      let attachments = [];
+      if (json.fields && json.fields.attachment) {
+        attachments = json.fields.attachment
+          .filter(att => att.mimeType && att.mimeType.startsWith('image/'))
+          .map(att => ({
+            filename: att.filename,
+            url: att.content,
+            mimeType: att.mimeType,
+            size: att.size
+          }));
+      }
+
       return {
         key: json.key,
-        summary: json.fields.summary,
-        description: json.fields.description,
-        status: json.fields.status?.name,
-        component: json.fields.components?.[0]?.name,
-        priority: json.fields.priority?.name
+        summary: json.fields?.summary,
+        description: json.fields?.description,
+        status: json.fields?.status?.name,
+        component: json.fields?.components?.[0]?.name,
+        priority: json.fields?.priority?.name,
+        attachments
       };
     }
 
@@ -117,7 +133,80 @@ class JiraValidator {
       }
     }
 
+    // CLI tool doesn't provide attachments
+    issue.attachments = [];
+
     return issue;
+  }
+
+  async fetchJiraAttachments(attachments) {
+    if (!attachments || attachments.length === 0) {
+      console.log('   ℹ No image attachments found\n');
+      return [];
+    }
+
+    console.log(`\n📸 Downloading ${attachments.length} screenshot(s)...\n`);
+
+    const { server, auth_type, api_token, username, password } = this.config.jira;
+    let authHeader;
+
+    if (auth_type === 'token') {
+      const token = api_token || process.env.JIRA_API_TOKEN;
+      const emailOrUser = username || process.env.JIRA_EMAIL || process.env.USER + '@redhat.com';
+      const base64Auth = Buffer.from(`${emailOrUser}:${token}`).toString('base64');
+      authHeader = `Authorization: Basic ${base64Auth}`;
+    } else {
+      const base64Auth = Buffer.from(`${username}:${password}`).toString('base64');
+      authHeader = `Authorization: Basic ${base64Auth}`;
+    }
+
+    const downloadedFiles = [];
+
+    for (let i = 0; i < attachments.length; i++) {
+      const attachment = attachments[i];
+      const ext = path.extname(attachment.filename) || '.png';
+      const filename = `bug-screenshot-${i + 1}${ext}`;
+      const filepath = path.join(this.testCaseDir, filename);
+
+      console.log(`   Downloading: ${attachment.filename} → ${filename}`);
+      console.log(`   URL: ${attachment.url}`);
+
+      const curlCmd = `curl -sL "${attachment.url}" -H "${authHeader}" -o "${filepath}"`;
+
+      await new Promise((resolve, reject) => {
+        const child = spawn('bash', ['-c', curlCmd], {
+          stdio: ['inherit', 'pipe', 'pipe']
+        });
+
+        let stderr = '';
+        child.stderr.on('data', (data) => {
+          stderr += data.toString();
+        });
+
+        child.on('close', (code) => {
+          if (code === 0) {
+            downloadedFiles.push({
+              original_filename: attachment.filename,
+              saved_as: filename,
+              path: filepath,
+              size: attachment.size
+            });
+            resolve();
+          } else {
+            console.error(`   ⚠ Failed to download ${attachment.filename}`);
+            if (stderr) {
+              console.error(`   Error: ${stderr.substring(0, 200)}`);
+            }
+            resolve(); // Continue with other attachments
+          }
+        });
+
+        child.on('error', reject);
+      });
+    }
+
+    console.log(`   ✓ Downloaded ${downloadedFiles.length} screenshot(s)\n`);
+    return downloadedFiles;
   }
 
   inferValidationType(issue) {
@@ -140,10 +229,67 @@ class JiraValidator {
     return 'standard';
   }
 
-  async createBugSpec(issueData) {
+  inferUIElement(issue) {
+    const summary = issue.summary || '';
+    const description = issue.description || '';
+    const combined = `${summary} ${description}`.toLowerCase();
+
+    // Try to extract UI element from summary
+    // Example: "cluster claim button not re-positioned" -> "Claim cluster" button
+    if (combined.includes('cluster claim button') || combined.includes('claim cluster')) {
+      return {
+        name: 'Claim cluster',
+        type: 'button'
+      };
+    }
+
+    // Generic button extraction
+    const buttonMatch = combined.match(/([a-z\s]+)\s+button/i);
+    if (buttonMatch) {
+      return {
+        name: buttonMatch[1].trim(),
+        type: 'button'
+      };
+    }
+
+    return null;
+  }
+
+  inferStepsToReproduce(issue) {
+    const summary = issue.summary || '';
+    const description = issue.description || '';
+    const combined = `${summary} ${description}`.toLowerCase();
+    const steps = [];
+
+    // Check for cluster pool related bugs
+    if (combined.includes('cluster pool')) {
+      steps.push({
+        step: 1,
+        action: 'navigate to Cluster pools tab under Infrastructure or Clusters',
+        critical: true,
+        note: 'Must navigate to cluster pools page'
+      });
+
+      // If it mentions "cluster claim" or details page, add step to open a pool
+      if (combined.includes('claim') || combined.includes('detail')) {
+        steps.push({
+          step: 2,
+          action: 'click on any cluster pool name to open the cluster pool details page',
+          critical: true,
+          note: 'This should navigate to a specific pool\'s detail page where the Claim cluster button exists'
+        });
+      }
+    }
+
+    return steps.length > 0 ? steps : null;
+  }
+
+  async createBugSpec(issueData, screenshots = []) {
     console.log(`📋 Creating bug specification for ${issueData.key}...\n`);
 
     const validationType = this.inferValidationType(issueData);
+    const uiElement = this.inferUIElement(issueData);
+    const stepsToReproduce = this.inferStepsToReproduce(issueData);
 
     const bugSpec = {
       jira_ticket: issueData.key,
@@ -157,9 +303,32 @@ class JiraValidator {
       }
     };
 
+    // Add UI element if inferred
+    if (uiElement) {
+      bugSpec.ui_element = uiElement;
+    }
+
+    // Add reproduction steps if inferred
+    if (stepsToReproduce) {
+      bugSpec.steps_to_reproduce = stepsToReproduce;
+      bugSpec.validation_instructions = {
+        navigation: stepsToReproduce.length > 1
+          ? "After completing reproduction steps, you should be on the correct page to test the UI element."
+          : "Navigate to the page mentioned in the reproduction steps."
+      };
+    }
+
     // Add type-specific config
     if (validationType === 'zoom-test') {
       bugSpec.zoom_levels = [50, 75, 100, 125, 150, 200];
+    }
+
+    // Add screenshots if available
+    if (screenshots && screenshots.length > 0) {
+      bugSpec.screenshots = screenshots.map(s => ({
+        filename: s.saved_as,
+        original_filename: s.original_filename
+      }));
     }
 
     // Create test case directory
@@ -225,8 +394,11 @@ class JiraValidator {
       const issueData = await this.fetchJiraIssue();
       console.log(`✓ Jira issue fetched: ${issueData.summary}\n`);
 
+      // Download attachments
+      const screenshots = await this.fetchJiraAttachments(issueData.attachments);
+
       // Create bug spec
-      await this.createBugSpec(issueData);
+      await this.createBugSpec(issueData, screenshots);
 
       // Create cluster config
       await this.createClusterConfig();

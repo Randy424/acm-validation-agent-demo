@@ -1,50 +1,98 @@
 {
-  "jira_ticket": "ACM-30661",
-  "summary": "Automation alert when AAP is not installed is incorrect",
-  "status": "New",
-  "assignee": "Kevin Cormier",
-  "acm_version": "2.16",
-  "bug_type": "UI - Incorrect Message",
-  "reproducibility": "Always",
-
+  "jira_ticket": "ACM-31343",
+  "url": "https://redhat.atlassian.net/browse/ACM-31343",
+  "summary": "[UI] Cluster pool - cluster claim button not re-positioned properly when zooming in/out on the cluster pool page",
+  "component": "Console",
+  "priority": "Normal",
+  "severity": "Moderate",
+  "status": "Backlog",
+  "labels": [
+    "Regression"
+  ],
+  "affects_version": "MCE 2.17.0",
+  "ocp_version": "4.20.14",
+  "mce_build": "2.17.0-DOWNSTREAM-2026-03-19-11-29-29",
+  "description": "When zooming in or out on the cluster pool page, the cluster claim button does not reposition itself properly, resulting in a layout issue.",
   "steps_to_reproduce": [
     {
       "step": 1,
-      "action": "Navigate to OpenShift Console",
-      "url": "https://console-openshift-console.apps.your-cluster.example.com"
+      "action": "Navigate to Infrastructure → Clusters → Cluster pools"
     },
     {
       "step": 2,
-      "action": "Login with YOUR-USERNAME credentials"
+      "action": "Select a specific cluster pool to view its details page"
     },
     {
       "step": 3,
-      "action": "Navigate to ACM perspective (if available) or find Clusters menu"
+      "action": "Set browser zoom to 100%"
     },
     {
       "step": 4,
-      "action": "Click on 'Automation' under Clusters section"
+      "action": "Verify cluster claim button is properly positioned (baseline)"
     },
     {
       "step": 5,
-      "action": "Observe the alert message when AAP is not installed"
+      "action": "Zoom in to 125%"
+    },
+    {
+      "step": 6,
+      "action": "Observe cluster claim button positioning"
+    },
+    {
+      "step": 7,
+      "action": "Zoom in to 150%"
+    },
+    {
+      "step": 8,
+      "action": "Observe cluster claim button positioning"
+    },
+    {
+      "step": 9,
+      "action": "Zoom out to 75%"
+    },
+    {
+      "step": 10,
+      "action": "Observe cluster claim button positioning"
+    },
+    {
+      "step": 11,
+      "action": "Zoom out to 50%"
+    },
+    {
+      "step": 12,
+      "action": "Observe cluster claim button positioning"
     }
   ],
-
-  "expected_result": "Alert should display correct information about Ansible workflow deprecation",
-  "actual_result": "Alert displays incorrect/outdated information",
-
-  "evidence_to_capture": [
-    "Screenshot of incorrect automation alert",
-    "Full page screenshot showing navigation path",
-    "Browser console logs if any errors present"
+  "expected_result": "At all zoom levels, the cluster claim button should maintain proper alignment and positioning relative to other UI elements. The button should remain accessible and fully visible. Layout should be responsive and adapt to zoom changes without visual artifacts or overlap.",
+  "actual_result": "The cluster claim button is not re-positioned properly when zooming in/out, causing misalignment or layout issues. Button may overlap other UI elements, be positioned outside the viewport, or show inconsistent alignment.",
+  "failure_criteria": [
+    "Button overlaps other UI elements",
+    "Button is positioned outside the viewport",
+    "Button alignment is inconsistent with the overall page layout",
+    "Visual artifacts appear around the button when zooming"
   ],
-
-  "validation_criteria": {
-    "bug_confirmed_if": [
-      "Alert message is visible",
-      "Alert content references deprecated Ansible workflow support",
-      "Message does not reflect current ACM capabilities"
-    ]
-  }
+  "preconditions": [
+    "ACM/MCE 2.17.0 or later installed",
+    "At least one cluster pool created",
+    "Access to the cluster pool page"
+  ],
+  "validation_approach": "AI-powered browser automation with multi-zoom screenshot capture",
+  "zoom_levels_to_test": [
+    50,
+    75,
+    100,
+    125,
+    150,
+    175,
+    200
+  ],
+  "elements_to_validate": [
+    "Cluster claim button",
+    "Button positioning relative to cluster pool details",
+    "Button visibility and accessibility",
+    "Overall page layout integrity"
+  ],
+  "reporter": "Thuy Nguyen",
+  "qa_contact": "David Huynh",
+  "created": "2026-03-20"
 }

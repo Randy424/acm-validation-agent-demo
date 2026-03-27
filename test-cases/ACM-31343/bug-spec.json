@@ -1,0 +1,46 @@
+{
+  "jira_ticket": "ACM-31343",
+  "summary": "[UI] Cluster pool - cluster claim button not re-positioned properly when zooming in/out on the cluster pool page",
+  "description": "h4. Description of problem:\n\n[UI] Cluster pool - cluster claim button not re-positioned properly when zooming in/out on the cluster pool page\n\nh4. Version-Release number of selected component (if applicable):\n\nOCP 4.20.14\n\nMCE 2.17.0-DOWNSTREAM-2026-03-19-11-29-29\n\nh4. How reproducible:\n\nh4. Steps to Reproduce:\n\n# Zoom in on the cluster pool page >> cluster claim button not re-positioned properly\n\nh4. Actual results:\n\nh4. Expected results:\n\nh4. Additional info:",
+  "validation_type": "zoom-test",
+  "environment": {
+    "component": "Console",
+    "status": "Backlog",
+    "priority": "Normal"
+  },
+  "ui_element": {
+    "name": "Claim cluster",
+    "type": "button"
+  },
+  "steps_to_reproduce": [
+    {
+      "step": 1,
+      "action": "navigate to Cluster pools tab under Infrastructure or Clusters",
+      "critical": true,
+      "note": "Must navigate to cluster pools page"
+    },
+    {
+      "step": 2,
+      "action": "click on any cluster pool name to open the cluster pool details page",
+      "critical": true,
+      "note": "This should navigate to a specific pool's detail page where the Claim cluster button exists"
+    }
+  ],
+  "validation_instructions": {
+    "navigation": "After completing reproduction steps, you should be on the correct page to test the UI element."
+  },
+  "zoom_levels": [
+    50,
+    75,
+    100,
+    125,
+    150,
+    200
+  ],
+  "screenshots": [
+    {
+      "filename": "bug-screenshot-1.png",
+      "original_filename": "Screenshot 2026-03-20 at 10.55.54 AM.png"
+    }
+  ]
+}
