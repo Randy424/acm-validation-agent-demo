@@ -192,6 +192,22 @@ cp .env.example .env
 # Edit .env and add: ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 ```
 
+### ⚠️ Security: Protecting Credentials
+
+**IMPORTANT:** Never commit cluster credentials to git!
+
+**Protected files (already in .gitignore):**
+- `test-cases/*/cluster-config.json` - Contains cluster passwords
+- `agent/config/*-cluster.json` - Contains cluster credentials
+- `.env` - Contains API keys
+
+**These files contain placeholder values:**
+- Username: `YOUR-USERNAME`
+- Password: `YOUR-PASSWORD-HERE`
+- Cluster URL: `your-cluster.example.com`
+
+**Replace placeholders with your actual credentials locally** - they will never be committed due to .gitignore protection.
+
 ### Usage (Agent Mode)
 
 The agent provides a unified interface for all validation scenarios.
